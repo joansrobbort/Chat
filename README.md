@@ -1,5 +1,54 @@
-//
 
+var selectedFeedBeanToDelete : FeedBean!
+    var selectedIndex = 0
+
+==========================================================
+func FeedLikeSend() {
+        SVProgressHUD.show(withStatus: "Loding...")
+        if let USerID = Pref.getObjectForKey(kUserBean) as? UserBean{
+            let param = ["feedId" : "\(selectedFeedBeanToDelete.feedId)",
+                         "userId" :"\(USerID.id)"] as [String : Any]
+            
+            print(param)
+            
+            ServerCall.sharedInstance.requestWithUrlAndParameters(.http_POST, urlString: URL_FEEDLIKE,parameters: param as [String : AnyObject], delegate: self, name: .FeedLikes)
+        }
+    }
+===================================================
+ if name == .FeedLikes {
+            print("\n\n\n SUCCESS FeedLikes........... \n \(responseObject)")
+            if let Dicdata = responseObject as? NSDictionary{
+                arrayFeedBeans[selectedIndex].status = TO_INT(Dicdata["status"]! as AnyObject)
+                if arrayFeedBeans[selectedIndex].status == 0 &&
+                    arrayFeedBeans[selectedIndex].totalLike > 0 {
+                    arrayFeedBeans[selectedIndex].totalLike -= 1
+                } else if arrayFeedBeans[selectedIndex].status == 1 {
+                    arrayFeedBeans[selectedIndex].totalLike += 1
+                }
+                
+                DispatchQueue.main.async {
+                    
+                    let idxPath = IndexPath(row: self.selectedIndex, section: 0)
+                    let cell = self.TableView.cellForRow(at: idxPath) as! MainMenuCell
+                    let bean = self.arrayFeedBeans[self.selectedIndex]
+                    if bean.status == 0 {
+                        cell.BtnLike.setTitle("Like", for:.normal)
+                    }
+                    else{
+                        cell.BtnLike.setTitle("UnLike", for:.normal)
+                    }
+                    
+                    cell.lbllike.text = String(bean.totalLike) + "  Likes"
+                    
+//                    let anIndexPath = IndexPath(row: self.selectedIndex, section: 0)
+//
+//                    self.TableView.reloadRows(at: [anIndexPath], with: .none)
+                    
+                }
+            }
+        }
+===================================================
+=======================================================================================================
 ar application in swift
 https://www.raywenderlich.com/146436/augmented-reality-ios-tutorial-location-based-2
 https://itunes.apple.com/in/app/augment-3d-augmented-reality/id506463171?mt=8
